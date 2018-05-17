@@ -19,40 +19,45 @@ public class TodoServlet extends DocksideServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Servlet Coming!");
 
-        // DBとか永続化された情報アクセス
-        TodoList todoList = TodoList.getInstance();
-
         // 関連クラス初期化
+        // staticにしてもマルチスレッド的に問題なさそうなら毎回インスタンス作らないほうが効率よさそう
         TodoView todoView = new TodoView();
+        TodoMain todoMain = new TodoMain();
 
         // TODO追加！！
+        addTodo(todoMain, req);
+
+        // todoリストの状態変更
+        toggleCheck(todoMain, req);
+        Boolean isDeleteError = deleteTodo(todoMain, req);
+
+        // viewへ
+        todoView.renderTodoPage(resp, todoMain.getAllTodo(), isDeleteError);
+    }
+
+    public void addTodo(TodoMain todoMain, HttpServletRequest req) {
         String add = req.getParameter("add");
         if (add != null && add.equals("true")) {
             String value = req.getParameter("value");
-            todoList.add(value);
+            todoMain.addTodo(value);
         }
+    }
 
-        // todoリストの状態変更
+    public void toggleCheck(TodoMain todoMain, HttpServletRequest req) {
         String check = req.getParameter("check");
         if (check != null && check.equals("true")) {
             Integer checkId = Integer.parseInt(req.getParameter("value"));
-            Boolean toggledCheck = todoList.get(checkId).checked ^ true;
-            todoList.setCheck(checkId, toggledCheck);
+            todoMain.toggleCheck(checkId);
         }
+    }
+
+    public Boolean deleteTodo(TodoMain todoMain, HttpServletRequest req) {
         String delete = req.getParameter("delete");
         Boolean isDeleteError = false;
         if (delete != null && delete.equals("true")) {
             Integer deleteId = Integer.parseInt(req.getParameter("value"));
-            Boolean nowCheck = todoList.get(deleteId).checked;
-            if (nowCheck) {
-                todoList.delete(deleteId);
-            } else {
-                isDeleteError = true;
-            }
+            isDeleteError = todoMain.deleteTodo(deleteId);
         }
-
-        // viewへ
-        todoView.renderTodoPage(resp, todoList.getAll(), isDeleteError);
+        return isDeleteError;
     }
-
 }
