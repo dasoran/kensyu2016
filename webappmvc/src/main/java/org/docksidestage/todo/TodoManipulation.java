@@ -2,12 +2,16 @@ package org.docksidestage.todo;
 
 import java.util.List;
 
-public class TodoMain {
+/**
+ * TODOを操作するクラス。データ実体の管理もする。
+ * @author dasoran
+ */
+public class TodoManipulation {
 
     // DBとか永続化された情報アクセス
-    TodoList todoList;
+    private TodoList todoList;
 
-    public TodoMain() {
+    public TodoManipulation() {
         todoList = TodoList.getInstance();
     }
 
@@ -15,13 +19,13 @@ public class TodoMain {
         todoList.add(todoName);
     }
 
-    public void toggleCheck(Integer id) {
-        Boolean toggledCheck = todoList.get(id).checked ^ true;
+    public void toggleCheck(int id) {
+        boolean toggledCheck = todoList.get(id).checked ^ true;
         todoList.setCheck(id, toggledCheck);
     }
 
-    public Boolean deleteTodo(Integer id) {
-        Boolean nowCheck = todoList.get(id).checked;
+    public Boolean deleteTodo(int id) {
+        boolean nowCheck = todoList.get(id).checked;
         if (nowCheck) {
             todoList.delete(id);
         } else {

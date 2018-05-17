@@ -20,44 +20,30 @@ public class TodoServlet extends DocksideServlet {
         logger.debug("Servlet Coming!");
 
         // 関連クラス初期化
-        // staticにしてもマルチスレッド的に問題なさそうなら毎回インスタンス作らないほうが効率よさそう
         TodoView todoView = new TodoView();
-        TodoMain todoMain = new TodoMain();
+        TodoManipulation todoManipulation = new TodoManipulation();
 
-        // TODO追加！！
-        addTodo(todoMain, req);
+        // URLからパラメータ取得
+        String add = req.getParameter("add");
+        String check = req.getParameter("check");
+        String delete = req.getParameter("delete");
 
-        // todoリストの状態変更
-        toggleCheck(todoMain, req);
-        Boolean isDeleteError = deleteTodo(todoMain, req);
+        boolean isDeleteError = false;
+        if ("true".equals(add)) {
+            // TODO追加！！
+            String value = req.getParameter("value");
+            todoManipulation.addTodo(value);
+        } else if ("true".equals(check)) {
+            // TODOのチェック変更
+            int checkId = Integer.parseInt(req.getParameter("value"));
+            todoManipulation.toggleCheck(checkId);
+        } else if ("true".equals(delete)) {
+            // TODO削除
+            int deleteId = Integer.parseInt(req.getParameter("value"));
+            isDeleteError = todoManipulation.deleteTodo(deleteId);
+        }
 
         // viewへ
-        todoView.renderTodoPage(resp, todoMain.getAllTodo(), isDeleteError);
-    }
-
-    public void addTodo(TodoMain todoMain, HttpServletRequest req) {
-        String add = req.getParameter("add");
-        if (add != null && add.equals("true")) {
-            String value = req.getParameter("value");
-            todoMain.addTodo(value);
-        }
-    }
-
-    public void toggleCheck(TodoMain todoMain, HttpServletRequest req) {
-        String check = req.getParameter("check");
-        if (check != null && check.equals("true")) {
-            Integer checkId = Integer.parseInt(req.getParameter("value"));
-            todoMain.toggleCheck(checkId);
-        }
-    }
-
-    public Boolean deleteTodo(TodoMain todoMain, HttpServletRequest req) {
-        String delete = req.getParameter("delete");
-        Boolean isDeleteError = false;
-        if (delete != null && delete.equals("true")) {
-            Integer deleteId = Integer.parseInt(req.getParameter("value"));
-            isDeleteError = todoMain.deleteTodo(deleteId);
-        }
-        return isDeleteError;
+        todoView.renderTodoPage(resp, todoManipulation.getAllTodo(), isDeleteError);
     }
 }

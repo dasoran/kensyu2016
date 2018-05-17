@@ -7,9 +7,12 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 画面を作るクラス
+ * @author dasoran
+ */
 public class TodoView {
 
-    // staticにする必要あり？
     public void renderTodoPage(HttpServletResponse resp, List<TodoElement> existTodo, Boolean isDeleteError)
             throws ServletException, IOException {
 

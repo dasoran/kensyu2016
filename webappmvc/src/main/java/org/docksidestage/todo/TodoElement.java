@@ -1,8 +1,5 @@
 package org.docksidestage.todo;
 
-/**
- * @author dasoran
- */
 public class TodoElement {
 
     public TodoElement(String name) {
@@ -11,5 +8,5 @@ public class TodoElement {
     }
 
     public String name;
-    public Boolean checked;
+    public boolean checked;
 }
